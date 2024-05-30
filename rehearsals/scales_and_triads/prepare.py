@@ -111,6 +111,10 @@ def __get_sources_as_list(template_as_list: list[str]) -> list[list[str]]:
             source = [event for event in source if event]
         sources_as_list.append(source)
 
+    for idx in range(len(sources_as_list)-1):
+        sources_as_list[idx][-1] = sources_as_list[idx][-1] + '\\bar "||"'
+    sources_as_list[idx+1][-1] = sources_as_list[idx+1][-1] + '\\bar "|."'
+
     return sources_as_list
 
 
