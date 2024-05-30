@@ -1,0 +1,4 @@
+sharp = {
+    "major": {},
+    "melodic minor": {}
+}
