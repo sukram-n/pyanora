@@ -19,7 +19,7 @@ class State:
         self.concert_pitch: float = 443.0
         self.exercise: str = "Two Octaves"
         self.changes_confirmed: bool = True
-        self.pitch_index: int = 0
+        self.cof_index: int = 0
         self.loop: bool = False
         self.mode: str = 'melodic minor'
         self.show_fingerings: bool = False
@@ -33,14 +33,14 @@ class State:
 
     @property
     def pitch(self):
-        return MUSIC.CIRCLE_OF_FIFTHS[self.mode.split()[-1]][self.pitch_index]
+        return MUSIC.CIRCLE_OF_FIFTHS[self.mode.split()[-1]][self.cof_index]
 
     def exercise_changed(self):
         self.exercise = st.session_state.exercise
         self.changes_confirmed = False
 
     def change_pitch_index(self, inc: int, length: int):
-        self.pitch_index = (self.pitch_index + inc) % length
+        self.cof_index = (self.cof_index + inc) % length
         self.changes_confirmed = False
 
     def key_confirm(self, pitch):

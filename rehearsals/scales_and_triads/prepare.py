@@ -1,10 +1,11 @@
+from multiprocessing import Pool
 import subprocess
 
 import streamlit as st
 
 from PYANORA_CONSTANTS import APP, EXERCISE, LILYPOND
-from .data import extract_data
 from fluidsynth import midi2wav
+from .data import extract_data
 
 
 def __get_template_as_list() -> tuple[list[str], str]:
@@ -33,7 +34,7 @@ def __get_template_as_list() -> tuple[list[str], str]:
     return template_as_list, octave
 
 
-def __get_sources_as_list(template_as_list: list[str]) -> list[list[str]]:
+def __get_sources_as_list(template_as_list: list[str]):
     state = st.session_state.pyanora.state
     sources_as_list = []
 
@@ -69,9 +70,10 @@ def __get_sources_as_list(template_as_list: list[str]) -> list[list[str]]:
             if state.show_slurs and duration % 48 == 0:
                 event = event + "\\("
             if event.startswith('F'):
-                new_source[-1] = new_source[-1] + "\\)"
-                if new_source[-1].endswith("\\(\\)"):
-                    new_source[-1] = new_source[-1].split("\\(")[0]
+                if state.show_slurs:
+                    new_source[-1] = new_source[-1] + "\\)"
+                    if new_source[-1].endswith("\\(\\)"):
+                        new_source[-1] = new_source[-1].split("\\(")[0]
                 while duration % 48 != 0:
                     new_source.append(f'r{note_value}')
                     duration += n_ticks
@@ -111,55 +113,88 @@ def __get_sources_as_list(template_as_list: list[str]) -> list[list[str]]:
             source = [event for event in source if event]
         sources_as_list.append(source)
 
-    for idx in range(len(sources_as_list)-1):
-        sources_as_list[idx][-1] = sources_as_list[idx][-1] + '\\bar "||"'
-    sources_as_list[idx+1][-1] = sources_as_list[idx+1][-1] + '\\bar "|."'
+    for source in sources_as_list[:-1]:
+        source[-1] = source[-1] + '\\bar "||"'
+    sources_as_list[-1][-1] = sources_as_list[-1][-1] + '\\bar "|."'
 
     return sources_as_list
 
 
-def __get_source() -> str:
+def __get_source() -> tuple[str, str, str]:
     state = st.session_state.pyanora.state
     template_as_list, octave = __get_template_as_list()
     sources_as_list = __get_sources_as_list(template_as_list)
 
-    _key = '\\key c \\minor\n'
-    if state.mode == 'major':
-        _key = '\\key c \\major\n'
-    sources_as_list[0][0] = _key + sources_as_list[0][0]
-    pitch4lilypond = state.pitch
-    source = LILYPOND.HEADER.format(state.basename, 'GP', pitch4lilypond, octave, state.tempo)
+    _key = f'\\key c \\{state.mode.split()[-1]}\n'
+    sources_as_list[0][0] = _key + 'r1' + sources_as_list[0][0]
+
+    instrument = ''
     for source_as_list in sources_as_list:
         for i in source_as_list:
-            source += f' {i}'
-    return (f' {source} }} \\layout {{ indent = 0 }} \\midi '
-            '{ }\n}\n}')
+            instrument += f' {i}'
+
+    metronome = 'c4 c4 c4 c4'
+
+    return instrument, metronome, octave
+
+
+def __instrument_only(instrument, octave) -> str:
+    state = st.session_state.pyanora.state
+    source = LILYPOND.INSTRUMENT_ONLY.format(
+        state.basename,
+        instrument,
+        state.pitch + octave,
+        state.tempo)
+    file_name = f'{state.basename}_instr_only'
+    with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
+        file.write(source)
+    return file_name
+
+
+def __instrument_metronome(instrument, octave) -> str:
+    state = st.session_state.pyanora.state
+    source = LILYPOND.INSTRUMENT_METRONOME.format(
+        state.basename,
+        instrument,
+        "c''4 c c c",
+        state.pitch + octave,
+        state.tempo)
+    file_name = f'{state.basename}_instr_metro'
+    with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
+        file.write(source)
+    return file_name
+
+
+def __sub_process(file_name):
+    subprocess.run(
+        ['lilypond', '--silent', '-dno-point-and-click', '--svg', f'--output={APP.FOLDER.TMP}',
+         f'{APP.FOLDER.TMP}/{file_name}.ly'])
 
 
 def __prepare_sheet_music() -> None:
     state = st.session_state.pyanora.state
+    files_to_process = []
+    instrument, metronome, octave = __get_source()
+    file_name = __instrument_metronome(instrument, octave)
+    files_to_process.append(file_name)
+    file_name = __instrument_only(instrument, octave)
+    files_to_process.append(file_name)
 
-    source = __get_source()
-    file_name = f'{APP.FOLDER.TMP}/{state.basename}.ly'
-    with open(file_name, 'w') as file:
-        file.write(source)
-
-    subprocess.run(
-        ['lilypond', '--silent', '-dno-point-and-click', '--svg', f'--output={APP.FOLDER.TMP}',
-         file_name])
+    with Pool(len(files_to_process)) as pool:
+        result=pool.map(__sub_process, files_to_process)
 
     # trim svg with inkscape
     subprocess.run(
         ['inkscape',
-         f'{APP.FOLDER.TMP}/{state.basename}_GP.svg',
-         f'--export-filename={APP.FOLDER.ASSETS}/{state.basename}.svg',
+         f'{APP.FOLDER.TMP}/{file_name}.svg',
+         f'--export-filename={APP.FOLDER.ASSETS}/{file_name}.svg',
          '--export-area-drawing'])
 
 
 def __prepare_audio():
     state = st.session_state.pyanora.state
-    tuning = midi2wav.pure_tuning(76, 443.0)
-    midi2wav.midi2wav(state.basename, what='GP', tuning=tuning)
+    tuning = midi2wav.pure_tuning(LILYPOND.LILY2MIDI[state.pitch], 443.0)
+    midi2wav.midi2wav(state.basename, what='instr_metro', tuning=tuning)
 
 
 def prepare():

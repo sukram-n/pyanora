@@ -17,7 +17,7 @@ class FOLDER:
 class APP:
     FOLDER: ClassVar = FOLDER
     ACCOMPANY: ClassVar = {
-        'GP': "Grand Piano (non pure)",
+        'GP': "Grand Piano",
         'DR': "Drone Root (incl. harmonics)",
         'DF': "Drone Fifth (incl. harmonics)",
         'PC': "Pure Chords"}
@@ -90,6 +90,57 @@ class LILYPOND:
         "E": '_\\Estring ',
     }
 
-    HEADER = ('\\version "2.24.1" \\language "english" \\include "./../lilypond/commons.ly"\n'
-              '\\book {{\n\\paper{{ tagline = ##f }}\n\\bookOutputName "{}_{}" \\score {{ \\new '
-              'Staff \\with {{ midiInstrument = "acoustic grand" }} \\transpose c {}{} \\relative c,{{\\tempo 4={}')
+    INSTRUMENT_ONLY = (
+        '\\version "2.24.1"\n\\language "english"\n\\include "./../lilypond/commons.ly"\n'
+        'outputName = "{}_instr_only"\n'
+        'instrument = {{\n{}\n}}\n'
+        'transposeTo = {}\n'
+        'setTempo = \\tempo 4={}\n'
+        '\\include "./../lilypond/instrument_only.ly"'
+    )
+
+    INSTRUMENT_METRONOME = (
+        '\\version "2.24.1"\n\\language "english"\n\\include "./../lilypond/commons.ly"\n'
+        'outputName = "{}_instr_metro"\n'
+        'instrument = {{\n{}\n}}\n'
+        'metronome = {{\n{}\n}}\n'
+        'transposeTo = {}\n'
+        'setTempo = \\tempo 4={}\n'
+        '\\include "./../lilypond/instrument_metronome.ly"'
+    )
+
+    HEADER = ('\\version "2.24.1"\n\\language "english"\n\\include "./../lilypond/commons.ly"\n'
+              'instrument = {{\n{}\n }}\n'
+              'metronome = {{\n{}\n }}\n'
+              '\\book {{\n'
+              '  \\paper{{ tagline = ##f }}\n'
+              '  \\bookOutputName "{}_{}"\n'
+              '  \\score {{\n'
+              '    \\layout {{ indent = 0 }}\n'
+              '    \\midi {{ }}\n'
+              '    <<\n'
+              '      \\new Staff \\with {{ midiInstrument = "acoustic grand" }} \\transpose c {}{} \\relative c,{{\n'
+              '        \\tempo 4={}\n'
+              '        \\instrument'
+              '      }}\n'
+              '      \\new Staff \\with {{ midiInstrument = "woodblock" }} \\relative c,{{\n'
+              '        \\metronome'
+              '      }}\n'
+              '    >>\n'
+              '  }}\n'
+              '}}\n')
+
+    LILY2MIDI = {
+        'a': 69,
+        'as': 70, 'bf': 70,
+        'b': 71, 'cf': 71,
+        'bs': 72, 'c': 72,
+        'cs': 73, 'df': 73,
+        'd': 74,
+        'ds': 75, 'ef': 75,
+        'e': 76, 'ff': 76,
+        'es': 77, 'f': 77,
+        'fs': 78, 'gf': 78,
+        'g': 79,
+        'gs': 80, 'af': 80,
+    }

@@ -62,7 +62,7 @@ def __pitch(tab):
     if _state.changes_confirmed:
         _prim_sec = 'primary'
 
-    k_c = _state.pitch_index
+    k_c = _state.cof_index
     # get circle of fifths for either major or minor
     c_o_f = MUSIC.CIRCLE_OF_FIFTHS[_state.mode.split()[-1]]
     length = len(c_o_f)
@@ -163,20 +163,20 @@ def __sidebar():
 def __main_window():
     state = st.session_state.pyanora.state
     # check for file existance before showing them
-    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}.svg'):
+    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}_instr_only.svg'):
         # the sheet music
-        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}.svg', use_column_width='always')
+        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}_instr_only.svg', use_column_width='always')
 
     # the audio file
 
     cond1 = state.accompany == APP.ACCOMPANY['GP'] and os.path.exists(
-        f'.assets/{state.basename}_GP.wav')
+        f'.assets/{state.basename}_instr_metro.wav')
     cond2 = state.accompany != APP.ACCOMPANY['GP']  # and self.audio.signal is not None
 
     if cond1 or cond2:
         cols = st.columns([0.9, 0.1])
         if cond1:
-            cols[0].audio(f'.assets/{state.basename}_GP.wav', loop=state.loop)
+            cols[0].audio(f'.assets/{state.basename}_instr_metro.wav', loop=state.loop)
         if cond2:
             pass  # cols[0].audio(self.audio.signal, loop=para.loop, sample_rate=pyanora.SAMPLE_RATE)
         cols[1].checkbox('Loop', key='loop', on_change=state.loop_changed)
