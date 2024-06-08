@@ -1,4 +1,5 @@
 import os
+
 import streamlit as st
 
 from PYANORA_CONSTANTS import EXERCISE, APP, MUSIC
@@ -27,9 +28,9 @@ def __f_pitch(p: str) -> str:
 def __accompany_tab(tab):
     state = st.session_state.pyanora.state
 
-    accompany = [_e for _k, _e in APP.ACCOMPANY.items()]
-    tab.selectbox('Accompany', accompany, key='accompamy',
-                  index=accompany.index(state.accompany))
+    tab.selectbox('Accompany', APP.ACCOMPANY, key='accompany',
+                  index=0,
+                  on_change=state.accompany_changed)
 
     tab.slider('Concert pitch (Hz)',
                438.0, 448.0, step=0.5, key='concert_pitch', disabled=False,
@@ -166,16 +167,12 @@ def __main_window():
 
     # the audio file
 
-    cond1 = state.accompany == APP.ACCOMPANY['GP'] and os.path.exists(
-        f'.assets/{state.basename}_instrument_metronome.wav')
-    cond2 = state.accompany != APP.ACCOMPANY['GP']  # and self.audio.signal is not None
+    cond1 = os.path.exists(
+        f'.assets/{state.basename}_{APP.ACCOMPANY[state.accompany]}.wav')
 
-    if cond1 or cond2:
+    if cond1:
         cols = st.columns([0.9, 0.1])
-        if cond1:
-            cols[0].audio(f'.assets/{state.basename}_instrument_metronome.wav', loop=state.loop)
-        if cond2:
-            pass  # cols[0].audio(self.audio.signal, loop=para.loop, sample_rate=pyanora.SAMPLE_RATE)
+        cols[0].audio(f'.assets/{state.basename}_{APP.ACCOMPANY[state.accompany]}.wav', loop=state.loop)
         cols[1].checkbox('Loop', key='loop', on_change=state.loop_changed)
 
 

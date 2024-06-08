@@ -10,12 +10,21 @@ class SKELETON:
     def ending(self):
         return self._ending
 
-    def source(self, basename, instrument_source='', metronome_source='', transpose_to='c', tempo=60):
+    def source(self, basename,
+               instrument_source='',
+               metronome_source='',
+               drone_source='',
+               drone_fifths_source='',
+               chords_source='',
+               transpose_to='c', tempo=60):
         __source = f'''\\version "2.24.1"
 \\language "english"
 \\include "./../lilypond/commons.ly"
 outputName = "{basename}_{self.ending}"
 instrument = {{\n{instrument_source}\n}}
+acc_chords = {{\n{chords_source}\n}}
+acc_drone = {{\n{drone_source}\n}}
+acc_drone_fifths = {{\n{drone_fifths_source}\n}}
 metronome = {{\n{metronome_source}\n}}
 transposeTo = {transpose_to}
 setTempo = \\tempo 4={tempo}
@@ -61,6 +70,9 @@ class Lilypond:
     }
 
     def __post_init__(self):
-        self.instrument_metronome = SKELETON('instrument_metronome')
         self.instrument_only = SKELETON('instrument_only')
+        self.instrument_metronome = SKELETON('instrument_metronome')
+        self.instrument_drone = SKELETON('instrument_drone')
+        self.instrument_drone_fifths = SKELETON('instrument_drone_fifths')
+        self.instrument_chords = SKELETON('instrument_chords')
 

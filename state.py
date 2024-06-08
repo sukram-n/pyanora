@@ -18,7 +18,7 @@ class State:
 
         self.current_rehearsal_name = ''
 
-        self.accompany: str = APP.ACCOMPANY['GP']
+        self.accompany: str = 'Grand Piano'
         self.concert_pitch: float = 443.0
         self.exercise: str = "Two Octaves"
         self.changes_confirmed: bool = True
@@ -51,7 +51,7 @@ class State:
 
     def accompany_changed(self):
         self.accompany = st.session_state.accompany
-        self.changes_confirmed = False
+        self.changes_confirmed = True
 
     def concert_pitch_changed(self):
         self.concert_pitch = st.session_state.concert_pitch

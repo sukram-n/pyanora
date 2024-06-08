@@ -121,6 +121,8 @@ class LilyList:
         data, octave = extract_data(state.pitch, state.mode, state.exercise)
 
         template = templates[state.mode][state.exercise]['notes'].split('~')
+        total_duration = 0
+
         for speed in sorted(state.durations):
 
             self.speed = speed
@@ -155,8 +157,9 @@ class LilyList:
             source = self.clean_up()
 
             sources_as_list.append(source)
+            total_duration += self.duration
 
-        return sources_as_list, octave
+        return sources_as_list, octave, total_duration
 
 
 def __get_source():
@@ -164,7 +167,7 @@ def __get_source():
 
     lilylist = LilyList()
 
-    instrument, octave = lilylist.get_sources_as_list()
+    instrument, octave, total_duration = lilylist.get_sources_as_list()
 
     # instrument, octave = __get_sources_as_list()  # template_as_list)
 
@@ -175,7 +178,14 @@ def __get_source():
 
     metronome = 'c4 c4 c4 c4 '
 
-    return instrument, metronome, octave
+    drone = ['r1'] + ["c''1"] * (total_duration // 48)
+    drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
+
+    drone_fifths = ['r1'] + ["<c g'>1"] * (total_duration // 48)
+    drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
+    chords = drone_fifths
+
+    return instrument, metronome, drone, drone_fifths, chords, octave
 
 
 def __sub_process(file_name):
@@ -187,13 +197,20 @@ def __sub_process(file_name):
 def __prepare_sheet_music() -> None:
     state = st.session_state.pyanora.state
     files_to_process = []
-    instrument, metronome, octave = __get_source()
+    instrument, metronome, drone, drone_fifths, chords, octave = __get_source()
 
-    for config in [state.lilypond.instrument_metronome, state.lilypond.instrument_only]:
+    for config in [state.lilypond.instrument_metronome,
+                   state.lilypond.instrument_drone,
+                   state.lilypond.instrument_drone_fifths,
+                   state.lilypond.instrument_chords,
+                   state.lilypond.instrument_only, ]:
         source, file_name = config.source(
             state.basename,
             instrument_source=instrument,
             metronome_source=metronome,
+            drone_source=drone,
+            drone_fifths_source=drone_fifths,
+            chords_source=chords,
             transpose_to=state.pitch + octave,
             tempo=state.tempo)
         with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
@@ -214,7 +231,7 @@ def __prepare_sheet_music() -> None:
 def __prepare_audio():
     state = st.session_state.pyanora.state
     tuning = midi2wav.pure_tuning(state.lilypond.LILY2MIDI[state.pitch], state.concert_pitch)
-    midi2wav.midi2wav(state.basename, what='instrument_metronome', tuning=tuning)
+    midi2wav.midi2wav(state.basename, what=APP.ACCOMPANY[state.accompany], tuning=tuning)
 
 
 def prepare():
@@ -223,29 +240,3 @@ def prepare():
         return
     __prepare_sheet_music()
     __prepare_audio()
-
-
-def __get_template_as_list() -> tuple[list[str], str]:
-    state = st.session_state.pyanora.state
-    data_set, octave = extract_data(
-        state.pitch,
-        state.mode,
-        state.exercise)
-    template = []
-    current_clef = ''
-    for d in data_set:
-        clef = '-'
-        if current_clef != d.clef and d.clef != '-':
-            clef = current_clef = d.clef
-
-        ff = ""
-        string = '-'
-        if state.show_fingerings:
-            for f in d.finger:
-                ff += state.lilypond.TRANSLATIONS[f]
-            string = d.string
-
-        text = f" {state.lilypond.TRANSLATIONS[clef]} {d.pitch_template}X{ff}{state.lilypond.TRANSLATIONS[string]}"
-        template.append(text)
-
-    return template, octave

@@ -12,6 +12,10 @@
       \new Staff \with { midiInstrument = "woodblock" } \relative c,{
         \metronome
       }
+      \new Staff \with { midiInstrument = "accoustic grand" }
+      \transpose c \transposeTo {
+        \acc_drone_fifths
+      }
     >>
   }
 }

@@ -17,10 +17,10 @@ class FOLDER:
 class APP:
     FOLDER: ClassVar = FOLDER
     ACCOMPANY: ClassVar = {
-        'GP': "Grand Piano",
-        'DR': "Drone Root (incl. harmonics)",
-        'DF': "Drone Fifth (incl. harmonics)",
-        'PC': "Pure Chords"}
+        "Grand Piano": 'instrument_metronome',
+        "Drone Root": 'instrument_drone',
+        "Drone Fifth": 'instrument_drone_fifths',
+        "Chords": 'instrument_chords'}
 
 
 # music general --------------------------------------------------------------------------------------------------------
