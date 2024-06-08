@@ -1,168 +1,181 @@
-from multiprocessing import Pool
 import subprocess
+from multiprocessing import Pool
 
 import streamlit as st
 
-from PYANORA_CONSTANTS import APP, EXERCISE, LILYPOND
+from PYANORA_CONSTANTS import APP, EXERCISE
 from fluidsynth import midi2wav
-from .data import extract_data
+from .data import extract_data, templates, defaults
 
 
-def __get_template_as_list() -> tuple[list[str], str]:
-    state = st.session_state.pyanora.state
-    data_set, octave = extract_data(
-        state.pitch,
-        state.mode,
-        state.exercise)
-    template_as_list = []
-    current_clef = ''
-    for d in data_set:
-        clef = '-'
-        if current_clef != d.clef and d.clef != '-':
-            clef = current_clef = d.clef
+class LilyList:
 
-        ff = ""
-        string = '-'
-        if state.show_fingerings:
-            for f in d.finger:
-                ff += LILYPOND.TRANSLATIONS[f]
-            string = d.string
+    def __init__(self):
+        super().__init__()
 
-        text = f"{LILYPOND.TRANSLATIONS[clef]}{d.pitch_template}X{ff}{LILYPOND.TRANSLATIONS[string]}"
-        template_as_list.append(text)
+        self.part = []
+        self._speed = ()
+        self._tuplets = ''
+        self._n_ticks = 0
+        self._note_value = 0
+        self._slur_is_open = False
+        self.data = None
+        self.octave = ''
+        self.duration = 0
 
-    return template_as_list, octave
+    @property
+    def speed(self):
+        return self._speed
 
-
-def __get_sources_as_list(template_as_list: list[str]):
-    state = st.session_state.pyanora.state
-    sources_as_list = []
-
-    for speed in sorted(state.durations):
-
-        # if sources_as_list:
-        #     sources_as_list[-1][-1] = f'{sources_as_list[-1][-1]}\\bar "||"'
-
+    @speed.setter
+    def speed(self, __speed):
         # n_ticks is the number of music/midi time ticks
         # 48 time ticks make up one 4/4 bar
         # note_value is one of 1/16 = 'sixteenth', 1/8 = 'eights', etc.
         # in most cases n_o_events=note_values but for triples
         # these values are different, e.g. 12 and 8 will give triplets of eights
-        n_ticks, note_value = EXERCISE.DURATIONS[speed]
 
-        # set duration
-        source = []
-        event = ''
-        for event in template_as_list:
-            event = event.replace('X', f'{note_value}')
-            source.append(event)
-        if not event.startswith('F'):
-            source.append('F')
-        sources_as_list.append((n_ticks, note_value, source))
+        self._speed = __speed
+        self._n_ticks, self._note_value = EXERCISE.DURATIONS[__speed]
+        self._tuplets = '{'
+        if 48 // self.n_ticks != self.note_value:
+            self._tuplets = '\\tuplet 3/2 4 {'
 
-    new_source_list = []
-    for n_ticks, note_value, source in sources_as_list:
-        new_source = []
-        duration = 0
-        i_event = 0
-        while source:
-            event = source.pop(0)
-            if state.show_slurs and duration % 48 == 0:
-                event = event + "\\("
-            if event.startswith('F'):
-                if state.show_slurs:
-                    new_source[-1] = new_source[-1] + "\\)"
-                    if new_source[-1].endswith("\\(\\)"):
-                        new_source[-1] = new_source[-1].split("\\(")[0]
-                while duration % 48 != 0:
-                    new_source.append(f'r{note_value}')
-                    duration += n_ticks
-            else:
-                new_source.append(event)
-                duration += n_ticks
-                if state.show_slurs and duration % 48 == 0:
-                    new_source[-1] = new_source[-1] + "\\)"
-                    if new_source[-1].endswith("\\(\\)"):
-                        new_source[-1] = new_source[-1].split("\\(")[0]
+    @property
+    def n_ticks(self):
+        return self._n_ticks
 
-        if 48 // n_ticks != note_value:
-            for i in range(0, len(new_source), 3):
-                if (new_source[i].startswith('r') and
-                        new_source[i + 1].startswith('r') and new_source[i + 2].startswith('r')):
-                    new_source[i] = f'r{note_value // 2}'
-                    new_source[i + 1] = ''
-                    new_source[i + 2] = ''
-                else:
-                    new_source[i] = f'\\tuplet 3/2 4{{{new_source[i]}'
-                    new_source[i + 2] = f'{new_source[i + 2]}}}'
-        new_source = [event for event in new_source if event]
-        new_source_list.append(new_source)
+    @property
+    def note_value(self):
+        return self._note_value
 
-    # collect rests
-    sources_as_list = []
-    for source in new_source_list:
+    @property
+    def tuplets(self):
+        return self._tuplets
+
+    def open_slur(self):
+        if st.session_state.pyanora.state.show_slurs:
+            if self.duration % 48 == self.n_ticks:
+                self.part[-1] += '\\('
+                self._slur_is_open = True
+
+    def close_slur(self):
+        if st.session_state.pyanora.state.show_slurs:
+            if self._slur_is_open:
+                self.part[-1] += '\\)'
+                self._slur_is_open = False
+
+    def add_event(self, clef, pitch, ff, string):
+        if st.session_state.pyanora.state.show_fingerings:
+            self.part.append(
+                f"{clef} {pitch}{self.note_value}{ff}{string}")
+        else:
+            self.part.append(
+                f"{clef} {pitch}{self.note_value}")
+
+        self.duration += self.n_ticks
+
+    def add_rest(self):
+        self.part.append(f"r{self.note_value}")
+        self.duration += self.n_ticks
+
+    def add_rests(self):
+        n = (48 - (self.duration % 48)) // self.n_ticks
+        self.part.extend([f"r{self.note_value}"] * n)
+        self.duration += n * self.n_ticks
+
+    def add_tuplet(self):
+        self.part[-1] += f' }}\n{self.tuplets}'
+
+    def clean_up(self):
+
+        source = ' '.join(self.part)
+
+        if 'tuplet' in source:
+            while 'r8 r8 r8 }' in source:
+                source = source.replace('r8 r8 r8 }', '} r4')
+
         found = True
+        source = source[::-1]
+        while '  ' in source:
+            source = source.replace('  ', ' ')
+        nl = ['61r', '8r', '4r', '2r', '1r']
         while found:
             found = False
-            for idx in range(len(source) - 1, 0, -1):
-                if source[idx] == source[idx - 1] and source[idx].startswith('r'):
-                    source[idx - 1] = f'r{int(source[idx][1:]) // 2}'
-                    source[idx] = ''
+            for n, r in zip(nl[:-1], nl[1:]):
+                if f'{n} {n}' in source:
                     found = True
+                    source = source.replace(f'{n} {n}', f'{r}')
+                    break
+        source = source[::-1]
+        source = source.replace('\\(\\)', '')
+        return source
 
-            source = [event for event in source if event]
-        sources_as_list.append(source)
+    def get_sources_as_list(self, sources_as_list=None):
 
-    for source in sources_as_list[:-1]:
-        source[-1] = source[-1] + '\\bar "||"'
-    sources_as_list[-1][-1] = sources_as_list[-1][-1] + '\\bar "|."'
+        if sources_as_list is None:
+            sources_as_list = []
 
-    return sources_as_list
+        state = st.session_state.pyanora.state
+
+        data, octave = extract_data(state.pitch, state.mode, state.exercise)
+
+        template = templates[state.mode][state.exercise]['notes'].split('~')
+        for speed in sorted(state.durations):
+
+            self.speed = speed
+            self.duration = 0
+            self.part = [self.tuplets]
+            for pitch, d in zip(template, data):
+                if pitch != 'F':
+                    ff = ""
+                    for f in d.finger:
+                        ff += state.lilypond.TRANSLATIONS[f]
+                    string = state.lilypond.TRANSLATIONS[d.string]
+                    clef = state.lilypond.TRANSLATIONS[d.clef]
+
+                    if self.duration % 48 == 0:
+                        self.close_slur()
+                        self.add_tuplet()
+
+                    self.add_event(clef, pitch, ff, string)
+                    self.open_slur()
+
+                else:
+                    self.close_slur()
+                    self.add_rest()
+                    self.add_rests()
+                    self.add_tuplet()
+
+            self.close_slur()
+            self.add_rests()
+
+            self.part.append('}')
+
+            source = self.clean_up()
+
+            sources_as_list.append(source)
+
+        return sources_as_list, octave
 
 
-def __get_source() -> tuple[str, str, str]:
+def __get_source():
     state = st.session_state.pyanora.state
-    template_as_list, octave = __get_template_as_list()
-    sources_as_list = __get_sources_as_list(template_as_list)
 
+    lilylist = LilyList()
+
+    instrument, octave = lilylist.get_sources_as_list()
+
+    # instrument, octave = __get_sources_as_list()  # template_as_list)
+
+    instrument[0] = templates[state.mode][state.exercise]['intro'].replace('~', ' ') + instrument[0]
     _key = f'\\key c \\{state.mode.split()[-1]}\n'
-    sources_as_list[0][0] = _key + 'r1' + sources_as_list[0][0]
+    _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+    instrument = _clef + _key + '\\bar "||"'.join(instrument) + '\\bar "|."'
 
-    instrument = ''
-    for source_as_list in sources_as_list:
-        for i in source_as_list:
-            instrument += f' {i}'
-
-    metronome = 'c4 c4 c4 c4'
+    metronome = 'c4 c4 c4 c4 '
 
     return instrument, metronome, octave
-
-
-def __instrument_only(instrument, octave) -> str:
-    state = st.session_state.pyanora.state
-    source = LILYPOND.INSTRUMENT_ONLY.format(
-        state.basename,
-        instrument,
-        state.pitch + octave,
-        state.tempo)
-    file_name = f'{state.basename}_instr_only'
-    with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
-        file.write(source)
-    return file_name
-
-
-def __instrument_metronome(instrument, octave) -> str:
-    state = st.session_state.pyanora.state
-    source = LILYPOND.INSTRUMENT_METRONOME.format(
-        state.basename,
-        instrument,
-        "c''4 c c c",
-        state.pitch + octave,
-        state.tempo)
-    file_name = f'{state.basename}_instr_metro'
-    with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
-        file.write(source)
-    return file_name
 
 
 def __sub_process(file_name):
@@ -175,13 +188,20 @@ def __prepare_sheet_music() -> None:
     state = st.session_state.pyanora.state
     files_to_process = []
     instrument, metronome, octave = __get_source()
-    file_name = __instrument_metronome(instrument, octave)
-    files_to_process.append(file_name)
-    file_name = __instrument_only(instrument, octave)
-    files_to_process.append(file_name)
+
+    for config in [state.lilypond.instrument_metronome, state.lilypond.instrument_only]:
+        source, file_name = config.source(
+            state.basename,
+            instrument_source=instrument,
+            metronome_source=metronome,
+            transpose_to=state.pitch + octave,
+            tempo=state.tempo)
+        with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
+            file.write(source)
+        files_to_process.append(file_name)
 
     with Pool(len(files_to_process)) as pool:
-        result=pool.map(__sub_process, files_to_process)
+        result = pool.map(__sub_process, files_to_process)
 
     # trim svg with inkscape
     subprocess.run(
@@ -193,8 +213,8 @@ def __prepare_sheet_music() -> None:
 
 def __prepare_audio():
     state = st.session_state.pyanora.state
-    tuning = midi2wav.pure_tuning(LILYPOND.LILY2MIDI[state.pitch], 443.0)
-    midi2wav.midi2wav(state.basename, what='instr_metro', tuning=tuning)
+    tuning = midi2wav.pure_tuning(state.lilypond.LILY2MIDI[state.pitch], state.concert_pitch)
+    midi2wav.midi2wav(state.basename, what='instrument_metronome', tuning=tuning)
 
 
 def prepare():
@@ -203,3 +223,29 @@ def prepare():
         return
     __prepare_sheet_music()
     __prepare_audio()
+
+
+def __get_template_as_list() -> tuple[list[str], str]:
+    state = st.session_state.pyanora.state
+    data_set, octave = extract_data(
+        state.pitch,
+        state.mode,
+        state.exercise)
+    template = []
+    current_clef = ''
+    for d in data_set:
+        clef = '-'
+        if current_clef != d.clef and d.clef != '-':
+            clef = current_clef = d.clef
+
+        ff = ""
+        string = '-'
+        if state.show_fingerings:
+            for f in d.finger:
+                ff += state.lilypond.TRANSLATIONS[f]
+            string = d.string
+
+        text = f" {state.lilypond.TRANSLATIONS[clef]} {d.pitch_template}X{ff}{state.lilypond.TRANSLATIONS[string]}"
+        template.append(text)
+
+    return template, octave

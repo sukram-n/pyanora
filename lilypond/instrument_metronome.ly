@@ -3,6 +3,7 @@
   \bookOutputName \outputName
   \score {
     \midi { }
+    \layout { }
     <<
       \new Staff \with { midiInstrument = "acoustic grand" }
       \transpose c \transposeTo  \relative c,{

@@ -4,7 +4,8 @@
   \score {
     \layout {
       indent = 0
-      \context { \Staff \RemoveAllEmptyStaves }
+      \context { \Staff \accidentalStyle modern-cautionary
+      }
     }
       \new Staff \with { midiInstrument = "acoustic grand" }
       \transpose c \transposeTo  \relative c,{

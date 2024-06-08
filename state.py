@@ -3,6 +3,7 @@ import uuid
 import streamlit as st
 
 from PYANORA_CONSTANTS import APP, EXERCISE, MUSIC
+from lilypond import Lilypond
 
 
 class State:
@@ -10,6 +11,8 @@ class State:
     def __init__(self):
 
         self.basename = uuid.uuid4().hex
+
+        self.lilypond = Lilypond()
 
         __speeds = list(EXERCISE.DURATIONS)
 

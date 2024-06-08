@@ -99,11 +99,8 @@ def __mode(tab):
     _state = st.session_state.pyanora.state
     _modes = list(data[_state.pitch])
 
-    # cols[1].markdown('$\\textsf{\\scriptsize permute}$ $\\textsf{\\scriptsize through}$')
-    # cols[1].markdown(
-    #     '$\\textsf{\\scriptsize circle}$ $\\textsf{\\scriptsize of}$ $\\textsf{\\scriptsize fifths}$')
-
     # --------------------------------------------------------------------------------------------------------------
+
     _index = 0
     if _state.mode in _modes:
         _index = _modes.index(_state.mode)
@@ -162,21 +159,21 @@ def __sidebar():
 
 def __main_window():
     state = st.session_state.pyanora.state
-    # check for file existance before showing them
-    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}_instr_only.svg'):
+    # check for file existance before trying to show them
+    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}_instrument_only.svg'):
         # the sheet music
-        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}_instr_only.svg', use_column_width='always')
+        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}_instrument_only.svg', use_column_width='always')
 
     # the audio file
 
     cond1 = state.accompany == APP.ACCOMPANY['GP'] and os.path.exists(
-        f'.assets/{state.basename}_instr_metro.wav')
+        f'.assets/{state.basename}_instrument_metronome.wav')
     cond2 = state.accompany != APP.ACCOMPANY['GP']  # and self.audio.signal is not None
 
     if cond1 or cond2:
         cols = st.columns([0.9, 0.1])
         if cond1:
-            cols[0].audio(f'.assets/{state.basename}_instr_metro.wav', loop=state.loop)
+            cols[0].audio(f'.assets/{state.basename}_instrument_metronome.wav', loop=state.loop)
         if cond2:
             pass  # cols[0].audio(self.audio.signal, loop=para.loop, sample_rate=pyanora.SAMPLE_RATE)
         cols[1].checkbox('Loop', key='loop', on_change=state.loop_changed)
