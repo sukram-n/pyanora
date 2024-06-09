@@ -1,3 +1,4 @@
+from enum import Flag, auto
 from dataclasses import dataclass
 from typing import ClassVar
 
@@ -66,3 +67,11 @@ class EXERCISE:
         '51/8' + MUSIC.TRIPLET: (4, 8),
         '61/16': (3, 16)
     }
+
+
+class ACCOMPANY(Flag):
+
+    DRONE = auto()
+    DRONE_FIFTHS = auto()
+    CHORDS = auto()
+    INSTRUMENT = auto()

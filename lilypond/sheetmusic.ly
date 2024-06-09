@@ -1,6 +1,6 @@
 \book {
   \paper{ tagline = ##f }
-  \bookOutputName \outputName
+  \bookOutputName \pyanoraOutputName
   \score {
     \layout {
       indent = 0
@@ -8,9 +8,9 @@
       }
     }
       \new Staff \with { midiInstrument = "acoustic grand" }
-      \transpose c \transposeTo  \relative c,{
-        \setTempo
-        \instrument
+      \transpose c \pyanoraTransposeTo  \relative c,{
+        \pyanoraSetTempo
+        \pyanoraSheetMusic
       }
   }
 }

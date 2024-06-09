@@ -2,14 +2,13 @@ import uuid
 
 import streamlit as st
 
-from PYANORA_CONSTANTS import APP, EXERCISE, MUSIC
+from PYANORA_CONSTANTS import EXERCISE, MUSIC
 from lilypond import Lilypond
 
 
 class State:
 
     def __init__(self):
-
         self.basename = uuid.uuid4().hex
 
         self.lilypond = Lilypond()
@@ -18,7 +17,10 @@ class State:
 
         self.current_rehearsal_name = ''
 
-        self.accompany: str = 'Grand Piano'
+        self.acc_instrument = True
+        self.acc_drone = False
+        self.acc_drone_fifths = False
+        self.acc_chords = False
         self.concert_pitch: float = 443.0
         self.exercise: str = "Two Octaves"
         self.changes_confirmed: bool = True
@@ -30,7 +32,8 @@ class State:
         self.durations: list = [__speeds[2], __speeds[5]]
         self.tempo: int = 60
 
-        for variable in ['accompany', 'concert_pitch', 'exercise', 'loop',
+        for variable in ['concert_pitch', 'exercise', 'loop',
+                         'acc_instrument', 'acc_drone', 'acc_drone_fifths', 'acc_chords',
                          'mode', 'show_fingerings', 'show_slurs', 'durations', 'tempo']:
             st.session_state[variable] = getattr(self, variable)
 
@@ -46,11 +49,23 @@ class State:
         self.cof_index = (self.cof_index + inc) % length
         self.changes_confirmed = False
 
-    def key_confirm(self, pitch):
-        self.changes_confirmed = True
+    def acc_drone_changed(self):
+        self.acc_drone = st.session_state.acc_drone
+        self.changes_confirmed = False
 
-    def accompany_changed(self):
-        self.accompany = st.session_state.accompany
+    def acc_drone_fifths_changed(self):
+        self.acc_drone_fifths = st.session_state.acc_drone_fifths
+        self.changes_confirmed = False
+
+    def acc_chords_changed(self):
+        self.acc_chords = st.session_state.acc_chords
+        self.changes_confirmed = False
+
+    def acc_instrument_changed(self):
+        self.acc_instrument = st.session_state.acc_instrument
+        self.changes_confirmed = False
+
+    def key_confirm(self, pitch):
         self.changes_confirmed = True
 
     def concert_pitch_changed(self):

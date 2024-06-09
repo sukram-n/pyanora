@@ -1,41 +1,69 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
+MIDI = '''
+\\midi {
+    \\context {
+      \\Score
+      midiChannelMapping = #'instrument
+      }
+}
+      '''
+LAYOUT = '''
+\\layout {
+    \\context {
+      \\Score
+      indent = 0
+    }
+}
+'''
 
-@dataclass
-class SKELETON:
-    _ending: str = ''
 
-    @property
-    def ending(self):
-        return self._ending
-
-    def source(self, basename,
-               instrument_source='',
-               metronome_source='',
-               drone_source='',
-               drone_fifths_source='',
-               chords_source='',
-               transpose_to='c', tempo=60):
-        __source = f'''\\version "2.24.1"
-\\language "english"
-\\include "./../lilypond/commons.ly"
-outputName = "{basename}_{self.ending}"
-instrument = {{\n{instrument_source}\n}}
-acc_chords = {{\n{chords_source}\n}}
-acc_drone = {{\n{drone_source}\n}}
-acc_drone_fifths = {{\n{drone_fifths_source}\n}}
-metronome = {{\n{metronome_source}\n}}
-transposeTo = {transpose_to}
-setTempo = \\tempo 4={tempo}
-\\include "./../lilypond/{self.ending}.ly"'''
-
-        return __source, f'{basename}_{self.ending}'
+def create_source(sources,
+                  pyanora_output_name,
+                  pyanora_transpose_to='c',
+                  pyanora_tempo=60,
+                  pyanora_output_type=MIDI):
+    __source = '\\version "2.24.1"\n'
+    __source += '\\language  "english"\n'
+    __source += '\\include "./../lilypond/commons.ly"\n'
+    __source += f'pyanoraOutputName = "{pyanora_output_name}"\n'
+    for source_name in sources:
+        __source += f'pyanora{source_name} = {{\n{sources[source_name]}\n}}\n'
+    __source += f'pyanoraTransposeTo = {pyanora_transpose_to}\n'
+    __source += f'pyanoraSetTempo = \\tempo 4 = {pyanora_tempo}\n'
+    __source += f'pyanoraOutputType = {pyanora_output_type} \n'
+    __source += '''\\book {
+  \\paper{ tagline = ##f }
+  \\bookOutputName \\pyanoraOutputName
+  \\score {
+    \\pyanoraOutputType
+    <<'''
+    for instr in ['Instrument', 'Drone', 'DroneFifths', 'Chords']:
+        if instr in sources:
+            __source += f'''
+      \\new Staff \\with {{ midiInstrument = "acoustic grand" }}
+      \\transpose c \\pyanoraTransposeTo  \\relative c,{{
+        \\pyanoraSetTempo
+        \\pyanora{instr}
+      }}'''
+    if 'Metronome' in sources:
+        __source += '''\\new Staff \\with { midiInstrument = "woodblock" } {
+        \\pyanoraSetTempo
+        \\pyanoraMetronome
+      }'''
+    __source += '''
+    >>
+  }
+}'''
+    return __source
 
 
 @dataclass
 class Lilypond:
     VERSION: ClassVar = "2.24.1"
+
+    # SOURCE_TYPES: ClassVar = ['Instrument', 'Metronome', 'Drone', 'DroneFifths', 'Chords']
 
     TRANSLATIONS: ClassVar = {
         "0": "^\\Nf",
@@ -68,11 +96,3 @@ class Lilypond:
         'g': 79,
         'gs': 80, 'af': 80,
     }
-
-    def __post_init__(self):
-        self.instrument_only = SKELETON('instrument_only')
-        self.instrument_metronome = SKELETON('instrument_metronome')
-        self.instrument_drone = SKELETON('instrument_drone')
-        self.instrument_drone_fifths = SKELETON('instrument_drone_fifths')
-        self.instrument_chords = SKELETON('instrument_chords')
-

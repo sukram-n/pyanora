@@ -4,9 +4,13 @@ import time
 import streamlit as st
 
 from PYANORA_CONSTANTS import APP
-import rehearsals.excerpts as Excerpts
-import rehearsals.scales_and_triads as ScalesAndTriads
+import rehearsals.excerpts as excerpts
+import rehearsals.scales_and_triads as scales_and_triads
 from state import State
+
+# ToDo
+# - add chords
+# - distinguish whether exercise has changed or only the accompany
 
 
 class PyanoRA:
@@ -77,8 +81,8 @@ def main():
         pyanora = PyanoRA()
 
         pyanora.rehearsals = {
-            'Scales and Triads': ScalesAndTriads,
-            'Excerpts': Excerpts
+            'Scales and Triads': scales_and_triads,
+            'Excerpts': excerpts
         }
         pyanora.state.current_rehearsal_name = 'Scales and Triads'
 

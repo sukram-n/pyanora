@@ -5,6 +5,7 @@ import streamlit as st
 
 from PYANORA_CONSTANTS import APP, EXERCISE
 from fluidsynth import midi2wav
+from lilypond import create_source, LAYOUT, MIDI
 from .data import extract_data, templates, defaults
 
 
@@ -162,30 +163,33 @@ class LilyList:
         return sources_as_list, octave, total_duration
 
 
-def __get_source():
+def __get_sources():
     state = st.session_state.pyanora.state
 
     lilylist = LilyList()
-
+    sources = {}
     instrument, octave, total_duration = lilylist.get_sources_as_list()
-
-    # instrument, octave = __get_sources_as_list()  # template_as_list)
 
     instrument[0] = templates[state.mode][state.exercise]['intro'].replace('~', ' ') + instrument[0]
     _key = f'\\key c \\{state.mode.split()[-1]}\n'
     _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
     instrument = _clef + _key + '\\bar "||"'.join(instrument) + '\\bar "|."'
 
-    metronome = 'c4 c4 c4 c4 '
+    sources['Instrument'] = instrument
 
-    drone = ['r1'] + ["c''1"] * (total_duration // 48)
+    sources['Metronome'] = 'c4 c4 c4 c4 '
+
+    drone = ['r1'] + ["c''1"] + ["c1"] * (total_duration // 48 - 1)
     drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
+    sources['Drone'] = drone
 
-    drone_fifths = ['r1'] + ["<c g'>1"] * (total_duration // 48)
+    drone_fifths = ['r1'] + ["<c'' g'>1"] + ["<c g'>1"] * (total_duration // 48 - 1)
     drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
-    chords = drone_fifths
+    sources['DroneFifths'] = drone_fifths
 
-    return instrument, metronome, drone, drone_fifths, chords, octave
+    chords = drone_fifths
+    sources['Chords'] = chords
+    return sources, octave
 
 
 def __sub_process(file_name):
@@ -197,22 +201,35 @@ def __sub_process(file_name):
 def __prepare_sheet_music() -> None:
     state = st.session_state.pyanora.state
     files_to_process = []
-    instrument, metronome, drone, drone_fifths, chords, octave = __get_source()
+    sources, octave = __get_sources()
 
-    for config in [state.lilypond.instrument_metronome,
-                   state.lilypond.instrument_drone,
-                   state.lilypond.instrument_drone_fifths,
-                   state.lilypond.instrument_chords,
-                   state.lilypond.instrument_only, ]:
-        source, file_name = config.source(
-            state.basename,
-            instrument_source=instrument,
-            metronome_source=metronome,
-            drone_source=drone,
-            drone_fifths_source=drone_fifths,
-            chords_source=chords,
-            transpose_to=state.pitch + octave,
-            tempo=state.tempo)
+    configs = {
+        'SheetMusic': {
+            'sources': ['Instrument'],
+            'type': LAYOUT
+        },
+        'Audio': {
+            'sources': ['Instrument' if state.acc_instrument else '',
+                        'Drone' if state.acc_drone else '',
+                        'DroneFifths' if state.acc_drone_fifths else '',
+                        'Chords' if state.acc_chords else '',
+                        'Metronome'],
+            'type': MIDI
+        }
+    }
+
+    for config in configs:
+        file_name = f'{state.basename}_{config.lower()}'
+        _sources = {}
+        for s in configs[config]['sources']:
+            if s:
+                _sources[s] = sources[s]
+        source = create_source(
+            _sources,
+            pyanora_output_name=file_name,
+            pyanora_transpose_to=state.pitch + octave,
+            pyanora_tempo=state.tempo,
+            pyanora_output_type=configs[config]['type'])
         with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
             file.write(source)
         files_to_process.append(file_name)
@@ -223,15 +240,15 @@ def __prepare_sheet_music() -> None:
     # trim svg with inkscape
     subprocess.run(
         ['inkscape',
-         f'{APP.FOLDER.TMP}/{file_name}.svg',
-         f'--export-filename={APP.FOLDER.ASSETS}/{file_name}.svg',
+         f'{APP.FOLDER.TMP}/{state.basename}_sheetmusic.svg',
+         f'--export-filename={APP.FOLDER.ASSETS}/{state.basename}_sheetmusic.svg',
          '--export-area-drawing'])
 
 
 def __prepare_audio():
     state = st.session_state.pyanora.state
     tuning = midi2wav.pure_tuning(state.lilypond.LILY2MIDI[state.pitch], state.concert_pitch)
-    midi2wav.midi2wav(state.basename, what=APP.ACCOMPANY[state.accompany], tuning=tuning)
+    midi2wav.midi2wav(state.basename, tuning=tuning)
 
 
 def prepare():

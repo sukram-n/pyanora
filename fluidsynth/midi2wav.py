@@ -175,13 +175,13 @@ def pure_tuning(key=69, concert_pitch=440.0):
     return _tuning
 
 
-def midi2wav(basename, what, tuning: c_void_p = pure_tuning(76)):
+def midi2wav(basename, tuning: c_void_p = pure_tuning(76)):
     settings = new_fluid_settings()
 
     fluid_settings_setstr(settings, "player.timing-source".encode(), "sample".encode())
     fluid_settings_setint(settings, "synth.lock-memory".encode(), 0)
     fluid_settings_setstr(settings, 'audio.file.name'.encode(),
-                          f"./.assets/{basename}_{what}.wav".encode())
+                          f"./.assets/{basename}_audio.wav".encode())
     synth = new_fluid_synth(settings)
     fluid_synth_sfload(synth, "/usr/share/sounds/sf2/FluidR3_GM.sf2".encode(), True)
 
@@ -194,7 +194,7 @@ def midi2wav(basename, what, tuning: c_void_p = pure_tuning(76)):
                                     apply=True)
     fluid_synth_activate_tuning(synth, 0, 0, 0, True)
 
-    fluid_player_add(player, f"./.tmp/{basename}_{what}.midi".encode())
+    fluid_player_add(player, f"./.tmp/{basename}_audio.midi".encode())
     fluid_player_play(player)
 
     while fluid_player_get_status(player) == FLUID_PLAYER_PLAYING:
@@ -211,4 +211,4 @@ def midi2wav(basename, what, tuning: c_void_p = pure_tuning(76)):
 
 
 if __name__ == "__main__":
-    midi2wav('04232369b269445995926ec4993719e4', 'GP')
+    ...

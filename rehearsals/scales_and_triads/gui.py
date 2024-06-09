@@ -28,9 +28,21 @@ def __f_pitch(p: str) -> str:
 def __accompany_tab(tab):
     state = st.session_state.pyanora.state
 
-    tab.selectbox('Accompany', APP.ACCOMPANY, key='accompany',
-                  index=0,
-                  on_change=state.accompany_changed)
+    tab.checkbox(f'Instrument', key='acc_instrument',
+                 value=state.acc_instrument,
+                 on_change=state.acc_instrument_changed)
+
+    tab.checkbox(f'Drone {state.pitch}', key='acc_drone',
+                 value=state.acc_drone,
+                 on_change=state.acc_drone_changed)
+
+    tab.checkbox(f'Drone {state.pitch} + 5ths', key='acc_drone_fifths',
+                 value=state.acc_drone_fifths,
+                 on_change=state.acc_drone_fifths_changed)
+
+    tab.checkbox(f'Chords', key='acc_chords',
+                 value=state.acc_chords,
+                 on_change=state.acc_chords_changed)
 
     tab.slider('Concert pitch (Hz)',
                438.0, 448.0, step=0.5, key='concert_pitch', disabled=False,
@@ -161,18 +173,15 @@ def __sidebar():
 def __main_window():
     state = st.session_state.pyanora.state
     # check for file existance before trying to show them
-    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}_instrument_only.svg'):
+    if os.path.exists(f'{APP.FOLDER.ASSETS}/{state.basename}_sheetmusic.svg'):
         # the sheet music
-        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}_instrument_only.svg', use_column_width='always')
+        st.image(f'{APP.FOLDER.ASSETS}/{state.basename}_sheetmusic.svg', use_column_width='always')
 
     # the audio file
 
-    cond1 = os.path.exists(
-        f'.assets/{state.basename}_{APP.ACCOMPANY[state.accompany]}.wav')
-
-    if cond1:
+    if os.path.exists(f'.assets/{state.basename}_audio.wav'):
         cols = st.columns([0.9, 0.1])
-        cols[0].audio(f'.assets/{state.basename}_{APP.ACCOMPANY[state.accompany]}.wav', loop=state.loop)
+        cols[0].audio(f'.assets/{state.basename}_audio.wav', loop=state.loop)
         cols[1].checkbox('Loop', key='loop', on_change=state.loop_changed)
 
 
