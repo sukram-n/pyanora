@@ -29,73 +29,120 @@ templates = {
         'One Octave': {
             'intro': 'r1',
             'notes': 'c~d~e~f~g~a~b~c~b~a~g~f~e~d~c',
-            'chords': ''
+            'chords': '<e g c>~<g b d>~<g c e>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<e g c>~<d g b>~<c f a>~<b d g>~<a c f>~<g c e>~<g b d>~'
+                      '<e g c>~'
         },
 
         'Two Octaves': {
             'intro': 'r1',
             'notes': 'c~d~e~f~g~a~b~c~d~e~f~g~a~b~c~b~a~g~f~e~d~c~b~a~g~f~e~d~c',
-            'chords': ''
+            'chords': '<e g c>~<g b d>~<g c e>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<e g c>~<g b d>~<g c e>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<e g c>~<d g b>~<c f a>~<b d g>~<a c f>~<g c e>~<g b d>~'
+                      '<e g c>~<d g b>~<c f a>~<b d g>~<a c f>~<g c e>~<g b d>~'
+                      '<e g c>~'
         },
         'Triads': {
             'intro': 'r1',
-            'notes': 'c~e~g~e~c~F~c~e~g~c~g~e~c~F~c~e~g~c~e~c~g~e~c~F~c~e~g~c~e~g~e~c~g~e~c~F~c~e~g~c~e~g~c~g~e~c~g~e'
-                     '~c',
-            'chords': ''
+            'notes': 'c~e~g~e~c~F~'
+                     'c~e~g~c~g~e~c~F~'
+                     'c~e~g~c~e~c~g~e~c~F~'
+                     'c~e~g~c~e~g~e~c~g~e~c~F~'
+                     'c~e~g~c~e~g~c~g~e~c~g~e~c',
+            'chords': '<e g c>~<g c e>~<c e g>~<g c e>~<e g c>~F~'
+                      '<e g c>~<g c e>~<c e g>~<e g c>~<c e g>~<g c e>~<e g c>~F~'
+                      '<e g c>~<g c e>~<c e g>~<e g c>~<g c e>~<e g c>~<c e g>~<g c e>~<e g c>~F~'
+                      '<e g c>~<g c e>~<c e g>~<e g c>~<g c e>~<c e g>~<g c e>~<e g c>~<c e g>~<g c e>~<e g c>~F~'
+                      '<e g c>~<g c e>~<c e g>~<e g c>~<g c e>~<c e g>~'
+                      '<e g c>~<c e g>~<g c e>~<e g c>~<c e g>~<g c e>~<e g c>~',
         },
     },
     'natural minor': {
         'One Octave': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~af~bf~c~bf~af~g~f~ef~d~c',
-            'chords': ' ',
+            'chords': '<ef g c>~<g b d>~<g c ef>~<af c f>~<bf d g>~<c f af>~<d g bf>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Two Octaves': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~af~bf~c~d~ef~f~g~af~bf~c~bf~af~g~f~ef~d~c~bf~af~g~f~ef~d~c',
-            'chords': ''
+            'chords': '<ef g c>~<g b d>~<g c ef>~<af c f>~<bf d g>~<c f af>~<d g bf>~'
+                      '<ef g c>~<g b d>~<g c ef>~<af c f>~<bf d g>~<c f af>~<d g bf>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Triads': {
             'intro': 'r1',
             'notes': 'c~ef~g~ef~c~F~c~ef~g~c~g~ef~c~F~c~ef~g~c~ef~c~g~ef~c~F~c~ef~g~c~ef~g~ef~c~g~ef~c~F~c~ef~g~c~ef'
                      '~g~c~g~ef~c~g~ef~c',
-            'chords': ''
+            'chords': '<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~'
+                      '<ef g c>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~',
         },
     },
     'harmonic minor': {
         'One Octave': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~af~b~c~b~af~g~f~ef~d~c',
-            'chords': ''
+            'chords': '<ef g c>~<g b d>~<g c ef>~<af c f>~<b d g>~<c f af>~<d g b>~'
+                      '<ef g c>~<d g b>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Two Octaves': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~af~b~c~d~ef~f~g~af~b~c~b~af~g~f~ef~d~c~b~af~g~f~ef~d~c',
-            'chords': ''
+            'chords': '<ef g c>~<g b d>~<g c ef>~<af c f>~<b d g>~<c f af>~<d g b>~'
+                      '<ef g c>~<g b d>~<g c ef>~<af c f>~<b d g>~<c f af>~<d g b>~'
+                      '<ef g c>~<d g b>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~<d g b>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Triads': {
             'intro': 'r1',
             'notes': 'c~ef~g~ef~c~F~c~ef~g~c~g~ef~c~F~c~ef~g~c~ef~c~g~ef~c~F~c~ef~g~c~ef~g~ef~c~g~ef~c~F~c~ef~g~c~ef'
                      '~g~c~g~ef~c~g~ef~c',
-            'chords': ''
+            'chords': '<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~'
+                      '<ef g c>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~',
         },
     },
     'melodic minor': {
         'One Octave': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~a~b~c~bf~af~g~f~ef~d~c',
-            'chords': ''
+            'chords': '<ef g c>~<g b d>~<g c ef>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Two Octaves': {
             'intro': 'r1',
             'notes': 'c~d~ef~f~g~a~b~c~d~ef~f~g~a~b~c~bf~af~g~f~ef~d~c~bf~af~g~f~ef~d~c',
-            'chords': ' ',
+            'chords': '<ef g c>~<g b d>~<g c ef>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<ef g c>~<g b d>~<g c ef>~<a c f>~<b d g>~<c f a>~<d g b>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~<d g bf>~<c f af>~<bf d g>~<af c f>~<g c ef>~<g bf d>~'
+                      '<ef g c>~'
         },
         'Triads': {
             'intro': 'r1',
             'notes': 'c~ef~g~ef~c~F~c~ef~g~c~g~ef~c~F~c~ef~g~c~ef~c~g~ef~c~F~c~ef~g~c~ef~g~ef~c~g~ef~c~F~c~ef~g~c~ef'
                      '~g~c~g~ef~c~g~ef~c',
-            'chords': ' ',
+            'chords': '<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~F~'
+                      '<ef g c>~<g c ef>~<c ef g>~<ef g c>~<g c ef>~<c ef g>~'
+                      '<ef g c>~<c ef g>~<g c ef>~<ef g c>~<c ef g>~<g c ef>~<ef g c>~',
         },
     }
 }

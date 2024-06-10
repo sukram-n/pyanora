@@ -112,10 +112,10 @@ class LilyList:
         source = source.replace('\\(\\)', '')
         return source
 
-    def get_sources_as_list(self, sources_as_list=None):
+    def get_instrument(self, instrument=None):
 
-        if sources_as_list is None:
-            sources_as_list = []
+        if instrument is None:
+            instrument = []
 
         state = st.session_state.pyanora.state
 
@@ -157,10 +157,91 @@ class LilyList:
 
             source = self.clean_up()
 
-            sources_as_list.append(source)
+            instrument.append(source)
             total_duration += self.duration
 
-        return sources_as_list, octave, total_duration
+        instrument[0] = templates[state.mode][state.exercise]['intro'].replace('~', ' ') + instrument[0]
+        _key = f'\\key c \\{state.mode.split()[-1]}\n'
+        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+        instrument = _clef + _key + '\\bar "||"'.join(instrument) + '\\bar "|."'
+
+        return instrument, octave, total_duration
+
+    def get_chords(self, chords=None):
+
+        if chords is None:
+            chords = []
+
+        state = st.session_state.pyanora.state
+
+        data, octave = extract_data(state.pitch, state.mode, state.exercise)
+
+        template = templates[state.mode][state.exercise]['chords'].split('~')
+        total_duration = 0
+
+        for speed in sorted(state.durations):
+
+            self.speed = speed
+            self.duration = 0
+            self.part = [self.tuplets]
+            for pitch, d in zip(template, data):
+                if pitch != 'F':
+                    ff = ""
+                    for f in d.finger:
+                        ff += state.lilypond.TRANSLATIONS[f]
+                    string = state.lilypond.TRANSLATIONS[d.string]
+                    clef = state.lilypond.TRANSLATIONS[d.clef]
+
+                    if self.duration % 48 == 0:
+                        self.close_slur()
+                        self.add_tuplet()
+
+                    self.add_event(clef, pitch, ff, string)
+                    self.open_slur()
+
+                else:
+                    self.close_slur()
+                    self.add_rest()
+                    self.add_rests()
+                    self.add_tuplet()
+
+            self.close_slur()
+            self.add_rests()
+
+            self.part.append('}')
+
+            source = self.clean_up()
+
+            chords.append(source)
+            total_duration += self.duration
+
+        chords[0] = templates[state.mode][state.exercise]['intro'].replace('~', ' ') + chords[0]
+        _key = f'\\key c \\{state.mode.split()[-1]}\n'
+        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+        chords = _clef + _key + '\\bar "||"'.join(chords) + '\\bar "|."'
+
+        return chords
+
+    def get_metronome(self):
+        return 'c4 c4 c4 c4 '
+
+
+    def get_drone(self, total_duration):
+        state = st.session_state.pyanora.state
+        _key = f'\\key c \\{state.mode.split()[-1]}\n'
+        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+
+        drone = ['r1'] + ["c''1"] + ["c1"] * (total_duration // 48 - 1)
+        drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
+        return drone
+
+    def get_drone_fifths(self, total_duration):
+        state = st.session_state.pyanora.state
+        _key = f'\\key c \\{state.mode.split()[-1]}\n'
+        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+        drone_fifths = ['r1'] + ["<c'' g'>1"] + ["<c g'>1"] * (total_duration // 48 - 1)
+        drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
+        return drone_fifths
 
 
 def __get_sources():
@@ -168,27 +249,14 @@ def __get_sources():
 
     lilylist = LilyList()
     sources = {}
-    instrument, octave, total_duration = lilylist.get_sources_as_list()
-
-    instrument[0] = templates[state.mode][state.exercise]['intro'].replace('~', ' ') + instrument[0]
-    _key = f'\\key c \\{state.mode.split()[-1]}\n'
-    _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
-    instrument = _clef + _key + '\\bar "||"'.join(instrument) + '\\bar "|."'
+    instrument, octave, total_duration = lilylist.get_instrument()
 
     sources['Instrument'] = instrument
 
-    sources['Metronome'] = 'c4 c4 c4 c4 '
-
-    drone = ['r1'] + ["c''1"] + ["c1"] * (total_duration // 48 - 1)
-    drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
-    sources['Drone'] = drone
-
-    drone_fifths = ['r1'] + ["<c'' g'>1"] + ["<c g'>1"] * (total_duration // 48 - 1)
-    drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
-    sources['DroneFifths'] = drone_fifths
-
-    chords = drone_fifths
-    sources['Chords'] = chords
+    sources['Metronome'] = lilylist.get_metronome()
+    sources['Drone'] = lilylist.get_drone(total_duration)
+    sources['DroneFifths'] = lilylist.get_drone_fifths(total_duration)
+    sources['Chords'] = lilylist.get_chords()
     return sources, octave
 
 

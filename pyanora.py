@@ -9,8 +9,7 @@ import rehearsals.scales_and_triads as scales_and_triads
 from state import State
 
 # ToDo
-# - add chords
-# - distinguish whether exercise has changed or only the accompany
+# - get rid of commons.ly
 
 
 class PyanoRA:

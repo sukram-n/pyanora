@@ -15,6 +15,10 @@ LAYOUT = '''
       \\Score
       indent = 0
     }
+    \\context {
+      \\Staff
+      \\accidentalStyle modern-cautionary
+    }
 }
 '''
 
@@ -42,7 +46,7 @@ def create_source(sources,
     for instr in ['Instrument', 'Drone', 'DroneFifths', 'Chords']:
         if instr in sources:
             __source += f'''
-      \\new Staff \\with {{ midiInstrument = "acoustic grand" }}
+      \\new Staff \\with {{ midiInstrument = "bright acoustic" }}
       \\transpose c \\pyanoraTransposeTo  \\relative c,{{
         \\pyanoraSetTempo
         \\pyanora{instr}
