@@ -222,26 +222,28 @@ class LilyList:
 
         return chords
 
-    def get_metronome(self):
-        return 'c4 c4 c4 c4 '
+
+def get_metronome():
+    return 'c4 c4 c4 c4 '
 
 
-    def get_drone(self, total_duration):
-        state = st.session_state.pyanora.state
-        _key = f'\\key c \\{state.mode.split()[-1]}\n'
-        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+def get_drone(total_duration):
+    state = st.session_state.pyanora.state
+    _key = f'\\key c \\{state.mode.split()[-1]}\n'
+    _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
 
-        drone = ['r1'] + ["c''1"] + ["c1"] * (total_duration // 48 - 1)
-        drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
-        return drone
+    drone = ['r1'] + ["c''1"] + ["c1"] * (total_duration // 48 - 1)
+    drone = _clef + _key + '\\bar "||"'.join(drone) + '\\bar "|."'
+    return drone
 
-    def get_drone_fifths(self, total_duration):
-        state = st.session_state.pyanora.state
-        _key = f'\\key c \\{state.mode.split()[-1]}\n'
-        _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
-        drone_fifths = ['r1'] + ["<c'' g'>1"] + ["<c g'>1"] * (total_duration // 48 - 1)
-        drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
-        return drone_fifths
+
+def get_drone_fifths(total_duration):
+    state = st.session_state.pyanora.state
+    _key = f'\\key c \\{state.mode.split()[-1]}\n'
+    _clef = f'\\clef "{defaults["double bass"]["clef"]}" '
+    drone_fifths = ['r1'] + ["<c'' g'>1"] + ["<c g'>1"] * (total_duration // 48 - 1)
+    drone_fifths = _clef + _key + '\\bar "||"'.join(drone_fifths) + '\\bar "|."'
+    return drone_fifths
 
 
 def __get_sources():
@@ -253,9 +255,9 @@ def __get_sources():
 
     sources['Instrument'] = instrument
 
-    sources['Metronome'] = lilylist.get_metronome()
-    sources['Drone'] = lilylist.get_drone(total_duration)
-    sources['DroneFifths'] = lilylist.get_drone_fifths(total_duration)
+    sources['Metronome'] = get_metronome()
+    sources['Drone'] = get_drone(total_duration)
+    sources['DroneFifths'] = get_drone_fifths(total_duration)
     sources['Chords'] = lilylist.get_chords()
     return sources, octave
 

@@ -46,7 +46,7 @@ def create_source(sources,
     for instr in ['Instrument', 'Drone', 'DroneFifths', 'Chords']:
         if instr in sources:
             __source += f'''
-      \\new Staff \\with {{ midiInstrument = "bright acoustic" }}
+      \\new Staff \\with {{ midiInstrument = "grand acoustic" }}
       \\transpose c \\pyanoraTransposeTo  \\relative c,{{
         \\pyanoraSetTempo
         \\pyanora{instr}
