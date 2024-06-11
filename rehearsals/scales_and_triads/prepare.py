@@ -262,68 +262,72 @@ def __get_sources():
     return sources, octave
 
 
-def __sub_process(file_name):
+def __sub_process(config):
+    state = st.session_state.pyanora.state
+    if 'layout' in config['type']:
+        file_name = f'{state.basename}_sheetmusic'
+    else:
+        file_name = f'{state.basename}_audio'
+
+    source = create_source(
+        config['sources'],
+        pyanora_output_name=file_name,
+        pyanora_transpose_to=state.pitch + config['octave'],
+        pyanora_tempo=state.tempo,
+        pyanora_output_type=config['type'])
+    with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
+        file.write(source)
     subprocess.run(
         ['lilypond', '--silent', '-dno-point-and-click', '--svg', f'--output={APP.FOLDER.TMP}',
          f'{APP.FOLDER.TMP}/{file_name}.ly'])
 
-
-def __prepare_sheet_music() -> None:
-    state = st.session_state.pyanora.state
-    files_to_process = []
-    sources, octave = __get_sources()
-
-    configs = {
-        'SheetMusic': {
-            'sources': ['Instrument'],
-            'type': LAYOUT
-        },
-        'Audio': {
-            'sources': ['Instrument' if state.acc_instrument else '',
-                        'Drone' if state.acc_drone else '',
-                        'DroneFifths' if state.acc_drone_fifths else '',
-                        'Chords' if state.acc_chords else '',
-                        'Metronome'],
-            'type': MIDI
-        }
-    }
-
-    for config in configs:
-        file_name = f'{state.basename}_{config.lower()}'
-        _sources = {}
-        for s in configs[config]['sources']:
-            if s:
-                _sources[s] = sources[s]
-        source = create_source(
-            _sources,
-            pyanora_output_name=file_name,
-            pyanora_transpose_to=state.pitch + octave,
-            pyanora_tempo=state.tempo,
-            pyanora_output_type=configs[config]['type'])
-        with open(f'{APP.FOLDER.TMP}/{file_name}.ly', 'w') as file:
-            file.write(source)
-        files_to_process.append(file_name)
-
-    with Pool(len(files_to_process)) as pool:
-        result = pool.map(__sub_process, files_to_process)
-
-    # trim svg with inkscape
-    subprocess.run(
-        ['inkscape',
-         f'{APP.FOLDER.TMP}/{state.basename}_sheetmusic.svg',
-         f'--export-filename={APP.FOLDER.ASSETS}/{state.basename}_sheetmusic.svg',
-         '--export-area-drawing'])
+    if 'sheetmusic' in file_name:
+        # trim svg with inkscape
+        subprocess.run(
+            ['inkscape',
+             f'{APP.FOLDER.TMP}/{state.basename}_sheetmusic.svg',
+             f'--export-filename={APP.FOLDER.ASSETS}/{state.basename}_sheetmusic.svg',
+             '--export-area-drawing'])
+    else:
+        state = st.session_state.pyanora.state
+        tuning = midi2wav.pure_tuning(state.lilypond.LILY2MIDI[state.pitch], state.concert_pitch)
+        midi2wav.midi2wav(state.basename, tuning=tuning)
+    return file_name
 
 
-def __prepare_audio():
-    state = st.session_state.pyanora.state
-    tuning = midi2wav.pure_tuning(state.lilypond.LILY2MIDI[state.pitch], state.concert_pitch)
-    midi2wav.midi2wav(state.basename, tuning=tuning)
-
-
-def prepare():
+def prepare() -> None:
     state = st.session_state.pyanora.state
     if not state.changes_confirmed:
         return
-    __prepare_sheet_music()
-    __prepare_audio()
+    files_to_process = []
+    sources, octave = __get_sources()
+
+    configs = [
+        # 'SheetMusic':
+        {
+            'sources': {'Instrument': sources['Instrument']},
+            'type': LAYOUT,
+            'octave': octave
+        },
+        # 'Audio':
+        {
+            'sources': {},
+            'type': MIDI,
+            'octave': octave
+        }
+    ]
+
+    if state.acc_instrument:
+        configs[1]['sources']['Instrument'] = sources['Instrument']
+    if state.acc_drone:
+        configs[1]['sources']['Drone'] = sources['Drone']
+    if state.acc_drone_fifths:
+        configs[1]['sources']['DroneFifths'] = sources['DroneFifths']
+    if state.acc_chords:
+        configs[1]['sources']['Chords'] = sources['Chords']
+    configs[1]['sources']['Metronome'] = sources['Metronome']
+
+    with Pool(2) as pool:
+        result = pool.map(__sub_process, configs)
+
+    print(result)
