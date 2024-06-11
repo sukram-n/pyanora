@@ -12,7 +12,7 @@ MIDI = '''
 LAYOUT = '''
 \\layout {
     #(layout-set-staff-size 15)
-    indent = 0\mm
+    indent = 0\\mm
     \\context {
       \\Score
     }
