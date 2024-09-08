@@ -160,7 +160,7 @@ BassA = {
   \tuplet 3/2 {g,16[ e-flat'16 e-flat16]}
 
   \tuplet 3/2 { e-flat,16_\sempreFF [ e-flat'16 e-flat16]}
-  \tuplet 3/2 { e-flat16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 { e-flat,16[ e-flat'16 e-flat16]}
   \tuplet 3/2 { a-flat,,16[ a-flat'16 a-flat16]}
   \tuplet 3/2 { a-flat,16[ a-flat'16 a-flat16]}
 
@@ -179,30 +179,30 @@ BassA = {
   d-flat,8 d-flat'8 d-flat'8 d-flat,8
   d-flat,8\sf d-flat'8 d-flat'8 d-flat,8 % 33
   \mark \default
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
 
   e-flat,8 e-flat8 \ff f8 g8 a-flat8
   b-flat8 c-flat8 d8 % 37
@@ -212,15 +212,15 @@ BassA = {
   e-flat8 e-flat,8 -. e-flat8 -. e-flat8 -.
   e-flat8 -. e-flat8 -. e-flat8 -. e-flat8 -.
 
-  \tuplet 3/2 {es16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
   a-flat,,2\sf
-  \tuplet 3/2 {es'16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
-  \tuplet 3/2 {es,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat'16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
+  \tuplet 3/2 {e-flat,16[ e-flat'16 e-flat16]}
   a-flat,,2
   f-flat2. \sf ^\markup{\italic {ritard.} }
   f-flat'4 % 42
