@@ -4,12 +4,9 @@ import time
 import streamlit as st
 
 from PYANORA_CONSTANTS import APP
-import rehearsals.excerpts as excerpts
-import rehearsals.scales_and_triads as scales_and_triads
+from rehearsals.excerpts import Excerpts
+from rehearsals.scales_and_triads import ScalesAndTriads
 from state import State
-
-# ToDo
-# - get rid of commons.ly
 
 
 class PyanoRA:
@@ -35,6 +32,9 @@ class PyanoRA:
     def current_rehearsal(self):
         return self.rehearsals[self.state.current_rehearsal_name]
 
+    def rehearsal_changed(self):
+        self.state.current_rehearsal_name = st.session_state.current_rehearsal_name
+
     def prepare(self):
         # delegate to current rehearsal class
         self.current_rehearsal.prepare()
@@ -43,7 +43,8 @@ class PyanoRA:
         st.write('Your Piano Rehearsal Accompanist')
 
         with st.sidebar:
-            st.selectbox('Show', self.rehearsals, key='current_rehearsal_name', label_visibility='collapsed')
+            st.selectbox('Show', self.rehearsals, key='current_rehearsal_name', label_visibility='collapsed',
+                         on_change=self.rehearsal_changed)
 
         self.current_rehearsal.gui()
 
@@ -80,8 +81,8 @@ def main():
         pyanora = PyanoRA()
 
         pyanora.rehearsals = {
-            'Scales and Triads': scales_and_triads,
-            'Excerpts': excerpts
+            'Scales and Triads': ScalesAndTriads(),
+            'Excerpts': Excerpts()
         }
         pyanora.state.current_rehearsal_name = 'Scales and Triads'
 

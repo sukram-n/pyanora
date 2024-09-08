@@ -1,0 +1,16 @@
+TRANSLATIONS = {
+    "0": "^\\Nf",
+    "1": "^\\If",
+    "2": "^\\Mf",
+    "3": "^\\Rf",
+    "4": "^\\Pf",
+    "t": "^\\Tf",
+    "-": "",
+    "B": '\\clef "bass_8"\n',
+    "T": '\\clef "tenor_8"\n',
+    "V": '\\clef "violin_8"\n',
+    "G": '_\\Gstring ',
+    "D": '_\\Dstring ',
+    "A": '_\\Astring ',
+    "E": '_\\Estring ',
+}

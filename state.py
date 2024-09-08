@@ -3,7 +3,6 @@ import uuid
 import streamlit as st
 
 from PYANORA_CONSTANTS import EXERCISE, MUSIC
-from lilypond import Lilypond
 
 
 class State:
@@ -11,7 +10,7 @@ class State:
     def __init__(self):
         self.basename = uuid.uuid4().hex
 
-        self.lilypond = Lilypond()
+        # self.lilypond = Lilypond()
 
         __speeds = list(EXERCISE.DURATIONS)
 
@@ -25,6 +24,9 @@ class State:
         self.exercise: str = "Two Octaves"
         self.changes_confirmed: bool = True
         self.cof_index: int = 0
+        self.excerpt = None
+        self.composer = None
+        self.composition = None
         self.loop: bool = False
         self.mode: str = 'melodic minor'
         self.show_fingerings: bool = False
@@ -32,7 +34,7 @@ class State:
         self.durations: list = [__speeds[2], __speeds[5]]
         self.tempo: int = 60
 
-        for variable in ['concert_pitch', 'exercise', 'loop',
+        for variable in ['concert_pitch', 'composer', 'composition', 'excerpt', 'exercise', 'loop',
                          'acc_instrument', 'acc_drone', 'acc_drone_fifths', 'acc_chords',
                          'mode', 'show_fingerings', 'show_slurs', 'durations', 'tempo']:
             st.session_state[variable] = getattr(self, variable)
@@ -41,13 +43,9 @@ class State:
     def pitch(self):
         return MUSIC.CIRCLE_OF_FIFTHS[self.mode.split()[-1]][self.cof_index]
 
-    def exercise_changed(self):
-        self.exercise = st.session_state.exercise
-        self.changes_confirmed = False
-
-    def change_pitch_index(self, inc: int, length: int):
-        self.cof_index = (self.cof_index + inc) % length
-        self.changes_confirmed = False
+    @pitch.setter
+    def pitch(self, _pitch):
+        self.cof_index = MUSIC.CIRCLE_OF_FIFTHS[self.mode.split()[-1]].index(_pitch)
 
     def acc_drone_changed(self):
         self.acc_drone = st.session_state.acc_drone
@@ -64,6 +62,29 @@ class State:
     def acc_instrument_changed(self):
         self.acc_instrument = st.session_state.acc_instrument
         self.changes_confirmed = False
+
+    def change_pitch_index(self, inc: int, length: int):
+        self.cof_index = (self.cof_index + inc) % length
+        self.changes_confirmed = False
+
+    def composer_changed(self):
+        self.composer = st.session_state.composer
+        self.composition = None
+        self.excerpt = None
+        self.changes_confirmed = False
+
+    def composition_changed(self):
+        self.composition = st.session_state.composition
+        self.excerpt = None
+        self.changes_confirmed = False
+
+    def exercise_changed(self):
+        self.exercise = st.session_state.exercise
+        self.changes_confirmed = False
+
+    def excerpt_changed(self):
+        self.excerpt = st.session_state.excerpt
+        self.changes_confirmed = True
 
     def key_confirm(self, pitch):
         self.changes_confirmed = True
@@ -93,4 +114,4 @@ class State:
 
     def tempo_changed(self):
         self.tempo = st.session_state.tempo
-        self.changes_confirmed = False
+        self.changes_confirmed = True

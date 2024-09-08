@@ -161,3 +161,4 @@ cython_debug/
 /.tmp/
 /.assets/
 /test/
+/old_stuff/

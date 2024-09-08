@@ -1,0 +1,52 @@
+BassA = {}
+BassB = {}
+BassC = {}
+BassD = {}
+BassE = {}
+BassF = {}
+BassG = {}
+BassH = {}
+BassI = {}
+BassJ = {}
+BassK = {}
+BassL = {}
+
+LyricsA = \lyricmode {}
+LyricsB = \lyricmode {}
+LyricsC = \lyricmode {}
+LyricsD = \lyricmode {}
+LyricsE = \lyricmode {}
+LyricsF = \lyricmode {}
+LyricsG = \lyricmode {}
+LyricsH = \lyricmode {}
+LyricsI = \lyricmode {}
+LyricsJ = \lyricmode {}
+LyricsK = \lyricmode {}
+LyricsL = \lyricmode {}
+
+VocalsA = #(define-music-function ()() #{ #(skip-of-length BassA) #})
+CelloA = #(define-music-function ()() #{ #(skip-of-length BassA) #})
+VocalsB = #(define-music-function ()() #{ #(skip-of-length BassB) #})
+CelloB = #(define-music-function ()() #{ #(skip-of-length BassB) #})
+VocalsC = #(define-music-function ()() #{ #(skip-of-length BassC) #})
+CelloC = #(define-music-function ()() #{ #(skip-of-length BassC) #})
+VocalsD = #(define-music-function ()() #{ #(skip-of-length BassD) #})
+CelloD = #(define-music-function ()() #{ #(skip-of-length BassD) #})
+VocalsE = #(define-music-function ()() #{ #(skip-of-length BassE) #})
+CelloE = #(define-music-function ()() #{ #(skip-of-length BassE) #})
+VocalsF = #(define-music-function ()() #{ #(skip-of-length BassF) #})
+CelloF = #(define-music-function ()() #{ #(skip-of-length BassF) #})
+VocalsG = #(define-music-function ()() #{ #(skip-of-length BassG) #})
+CelloG = #(define-music-function ()() #{ #(skip-of-length BassG) #})
+VocalsH = #(define-music-function ()() #{ #(skip-of-length BassH) #})
+CelloH = #(define-music-function ()() #{ #(skip-of-length BassH) #})
+VocalsI = #(define-music-function ()() #{ #(skip-of-length BassI) #})
+CelloI = #(define-music-function ()() #{ #(skip-of-length BassI) #})
+VocalsJ = #(define-music-function ()() #{ #(skip-of-length BassJ) #})
+CelloJ = #(define-music-function ()() #{ #(skip-of-length BassJ) #})
+VocalsK = #(define-music-function ()() #{ #(skip-of-length BassK) #})
+CelloK = #(define-music-function ()() #{ #(skip-of-length BassK) #})
+VocalsL = #(define-music-function ()() #{ #(skip-of-length BassL) #})
+CelloL = #(define-music-function ()() #{ #(skip-of-length BassL) #})
+
+
